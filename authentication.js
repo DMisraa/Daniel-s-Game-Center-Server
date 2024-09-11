@@ -12,13 +12,13 @@ export function generateTokenByLink(player1Id, player2Id, gameId, gameType) {
     { playedId: player2Id, gameId, role: "player2" },
     secretKey
   );
-
+process.en
   console.log(gameId, 'generateToken Fn')
 
   console.log(player1Token, 'Token 1', player2Token, "Token 2");
 
-  const invitedPlayerLink = `http://localhost:3000/${gameType}/${gameId}?token=${player1Token}`;
-  const gameCreatorLink = `http://localhost:3000/${gameType}/${gameId}?token=${player2Token}`;
+  const invitedPlayerLink = `${process.env.NODE_BASE_URL}/${gameType}/${gameId}?token=${player1Token}`;
+  const gameCreatorLink = `${process.env.NODE_BASE_URL}/${gameType}/${gameId}?token=${player2Token}`;
 
   return { invitedPlayerLink, gameCreatorLink };
 }
