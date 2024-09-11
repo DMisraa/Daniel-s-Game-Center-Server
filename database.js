@@ -12,10 +12,26 @@ export async function connectToDatabase() {
   return { gameCenterCollection, client };
 }
 
+export async function connectToGameIdDatabase() {
+  client = await MongoClient.connect(uri);
+
+  const db = client.db("Game-Center");
+  const gameCenterCollection = db.collection("connect4_Online");
+  return { gameCenterCollection, client };
+}
+
 export async function connectToTicTacToeDatabase() {
   client = await MongoClient.connect(uri);
 
   const db = client.db("Game-Center");
   const gameCenterCollection = db.collection("Tic_Tac_Toe");
+  return { gameCenterCollection, client };
+}
+
+export async function connectToTicTacToeGameId() {
+  client = await MongoClient.connect(uri);
+
+  const db = client.db("Game-Center");
+  const gameCenterCollection = db.collection("Tic_Tac_Toe_Online");
   return { gameCenterCollection, client };
 }

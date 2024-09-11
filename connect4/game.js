@@ -10,6 +10,7 @@ export class Connect4 {
     this.winner = null;
     this.turns = 0;
     this.gameId = "p1"
+    this.hasDraw = false
     this.playerNames = {
       yellowPlayer: "Yellow Player",
       redPlayer: "Red Player",
@@ -32,15 +33,15 @@ export class Connect4 {
 
     this.board = Array.from({ length: 6 }, () => Array(7).fill(null));
     this.winner = null;
-    this.hasDraw = null;
-    this.turns = 0;
+    this.turns = 0
 
     const data = {
       board: this.board,
       currentPlayer: this.currentPlayer,
       winner: this.winner,
-      hasDraw: this.hasDraw,
+      hasDraw: false,
       allTimeWinners: games,
+      turnLength: this.turns
     };
     console.log(data, 'startover Document')
 
@@ -75,6 +76,7 @@ export class Connect4 {
     }
   }
   async dataBase() {
+
     const draw = this.turns === 42 && !this.winner;
     
     const data = {
@@ -83,7 +85,7 @@ export class Connect4 {
       winner: this.winner,
       hasDraw: draw,
       allTimeWinners: games,
-
+      turnLength: this.turns,
       playerNames: this.playerNames,
     };
 

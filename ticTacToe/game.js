@@ -1,5 +1,5 @@
 import { connectToTicTacToeDatabase } from "../database.js";
-import WINNING_COMBINATIONS from './WINNING_COMBINATIONS.js'
+import WINNING_COMBINATIONS from "./WINNING_COMBINATIONS.js";
 
 let initialGameBoard = [
   [null, null, null],
@@ -31,6 +31,7 @@ export class TicTacToe {
   }
   deriveWinner(players, gameBoard) {
     let winner;
+    console.log(gameBoard, 'gameBoard, deriveWinner Fn')
 
     for (const combination of WINNING_COMBINATIONS) {
       const firstSquareSymbole =
@@ -65,12 +66,13 @@ export class TicTacToe {
     } 
   }
 
-  async ticTacToeDataBase(board) {
+  async ticTacToeDataBase(gameBoard) {
     this.turns++
     console.log(this.turns)
+    console.log(gameBoard, 'board ticTacToeDataBase')
 
     let data = {
-      board: board,
+      gameBoard,
       playerNames: {
         X: this.playerNames.X,
         O: this.playerNames.O,
@@ -82,7 +84,9 @@ export class TicTacToe {
       }
     };
 
-    const winner = this.deriveWinner(this.playerNames, data.board);
+    console.log(data.gameBoard, 'gameBoard, ticTacToeDataBase')
+
+    const winner = this.deriveWinner(this.playerNames, data.gameBoard);
     const hasDraw = this.turns === 9 && !winner
 
     if (winner || hasDraw) {
@@ -101,7 +105,7 @@ export class TicTacToe {
       }
 
        data = {
-        board: initialGameBoard,
+        gameBoard: initialGameBoard,
         playerNames: {
           X: this.playerNames.X,
           O: this.playerNames.O,
@@ -112,7 +116,6 @@ export class TicTacToe {
             O: allTimeScore.O
         }
       };
-      
     }
 
     try {
