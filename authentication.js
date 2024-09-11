@@ -19,6 +19,7 @@ process.en
 
   const invitedPlayerLink = `${process.env.NEXT_PUBLIC_BASE_URL}/${gameType}/${gameId}?token=${player1Token}`;
   const gameCreatorLink = `${process.env.NEXT_PUBLIC_BASE_URL}/${gameType}/${gameId}?token=${player2Token}`;
+  console.log(process.env.NEXT_PUBLIC_BASE_URL, 'NEXT_PUBLIC_BASE_URL')
 
   return { invitedPlayerLink, gameCreatorLink };
 }
