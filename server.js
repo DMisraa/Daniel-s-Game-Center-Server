@@ -234,7 +234,7 @@ let gameType = 'connectFour'
   try {
     const transporter = await game_Online.sendMail()
     await transporter.sendMail(msg);
-    res.status(200).json({ message: "Invitation sent!" });
+    res.status(200).json({ gameId: gameIdStringfy });
   } catch (error) {
     console.error("Error sending email:", error);
     res.status(500).json({ error: "Failed to send invitation." });
@@ -323,6 +323,7 @@ app.get("/connectFour/:gameId", async (req, res) => {
       allTimeWinners,
       hasDraw,
       playerChallenged,
+      gameLinksWithTokens
     });
   } catch (error) {
     console.error("Error handling request:", error);
@@ -452,7 +453,7 @@ app.post("/ticTacToe/game", async (req, res) => {
   try {
     const transporter = await ticTacToe_Online_Game.sendMail()
     await transporter.sendMail(msg);
-    res.status(200).json({ message: "Invitation sent!" });
+    res.status(200).json({ gameId: gameIdStringfy });
   } catch (error) {
     console.error("Error sending email:", error);
     res.status(500).json({ error: "Failed to send invitation." });
@@ -469,6 +470,7 @@ app.post("/ticTacToe/game", async (req, res) => {
   } catch (error) {
     console.error("Error sending userName data", error);
   }
+  
 });
 
 app.get("/ticTacToe/:gameId", async (req, res) => {
@@ -534,7 +536,8 @@ app.get("/ticTacToe/:gameId", async (req, res) => {
       allTimeWinners,
       hasDraw,
       playerChallenged,
-      currentPlayer
+      currentPlayer, 
+      gameLinksWithTokens
     });
   } catch (error) {
     console.error("Error handling request:", error);
