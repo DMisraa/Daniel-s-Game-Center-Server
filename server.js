@@ -169,6 +169,11 @@ io.on('connection', (socket) => {
     io.to(gameId).emit("gameUpdated", gameData); // Broadcast to all users in the room
   });
 
+  socket.on("initial_GET", async ({gameId}) => {
+    const gameData = await ticTacToe_Online_Game.getAllData(gameId);
+    io.to(gameId).emit('initialPageLoad', gameData)
+  })
+
   socket.on("disconnect", () => {
     console.log("A user disconnected:", socket.id);
   });
