@@ -20,7 +20,7 @@ dotenv.config();
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: process.env.BASE_URL, 
+    origin: process.env.BASE_URL, 'https://daniel-s-game-center-front.vercel.app',
     methods: ["GET", "POST", 'PUT', 'PATCH'], 
     credentials: true // Allow cookies or authentication headers if necessary
   },
