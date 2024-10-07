@@ -18,8 +18,8 @@ process.en
   console.log(player1Token, 'Token 1', player2Token, "Token 2");
 
   
-  const invitedPlayerLink = `${process.env.NEXT_PUBLIC_BASE_URL}/${gameType}/${gameId}/?token=${player1Token}`
-  const gameCreatorLink = `${process.env.NEXT_PUBLIC_BASE_URL}/${gameType}/${gameId}/?token=${player2Token}`
+  const invitedPlayerLink = `${process.env.BASE_URL}/${gameType}/${gameId}/?token=${player1Token}`
+  const gameCreatorLink = `${process.env.BASE_URL}/${gameType}/${gameId}/?token=${player2Token}`
   console.log(process.env.NEXT_PUBLIC_BASE_URL + 'line after url', 'NEXT_PUBLIC_BASE_URL')
 
   return { invitedPlayerLink, gameCreatorLink };
