@@ -150,7 +150,7 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => {
   console.log("A client connected:", socket.id);
 
-  socket.on("joinGame", (gameId) => {
+  socket.on("joinRoom", ({gameId}) => {
     socket.join(gameId);
     console.log(`User joined game: ${gameId}`);
   });
@@ -166,11 +166,13 @@ io.on('connection', (socket) => {
 
     const gameData = await ticTacToe_Online_Game.makeMove(board, gameId, playerNames);
     console.log("Broadcasting updated game to room:", gameId, gameData);
-    io.to(gameId).emit("gameUpdated", gameData); // Broadcast to all users in the room
+    io.to(gameId).emit("initialPageLoad", gameData); // Broadcast to all users in the room
   });
 
   socket.on("initial_GET", async ({gameId}) => {
     const gameData = await ticTacToe_Online_Game.getAllData(gameId);
+    console.log('Socket GET RUNNING')
+    console.log("Broadcasting initial Page to room:", gameId, gameData);
     io.to(gameId).emit('initialPageLoad', gameData)
   })
 
@@ -638,7 +640,7 @@ app.patch('/ticTacToe/:gameId/startOver', async (req, res) => {
 
 app.post('/ticTacToe/sendMail', async (req,res) => {
   const {playerNames, emailAdress, gameLinksWithTokens} = req.body
-  console.log(req.body, 'req.body data')
+  console.log('req.body data:', req.body)
   const msg = {
     from: emailAdress.InvitedPlayer,
     to: emailAdress.invitingPlayer,
