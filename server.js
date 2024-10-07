@@ -10,9 +10,23 @@ import { Connect4_Online } from "./connect4/onlineGame.js";
 import { connectToGameIdDatabase, connectToTicTacToeGameId } from "./database.js";
 import { generateTokenByLink } from "./authentication.js";
 import { TicTacToe_Online } from "./ticTacToe/onlineGame.js";
+import { createServer } from 'node:http';
+import { Server } from 'socket.io';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
 
 const app = express();
+dotenv.config();
+const server = createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: process.env.BASE_URL, 
+    methods: ["GET", "POST", 'PUT', 'PATCH'], 
+    credentials: true // Allow cookies or authentication headers if necessary
+  },
+})
 const port = 4000;
+const socketPort = 4001
 const game = new Connect4();
 const game_Online = new Connect4_Online();
 const ticTacToe_Game = new TicTacToe();
@@ -21,13 +35,39 @@ const { verify } = pkg;
 
 app.use(cors());
 app.use(bodyParser.json());
-dotenv.config();
+
 
 export let games = {
   yellowPlayer: 0,
   redPlayer: 0,
   draw: 0,
 };
+
+async function socket_authenticatePlayer(token, gameId, gameType) {
+  try {
+    const decoded = verify(token, process.env.JWT_SECRET);
+    let game;
+
+    if (gameType === 'connectFour') {
+      game = await game_Online.getGameDataById(gameId);
+    } else if (gameType === 'ticTacToe') {
+      game = await ticTacToe_Online_Game.getGameDataById(gameId);
+    }
+
+    if (!game || !Object.values(game.playersId).includes(decoded.playedId)) {
+      return { error: "Not authorized to play this game" };
+    }
+
+    if (game.currentPlayer !== decoded.playedId) {
+      return { error: "It's not your turn" };
+    }
+
+    return { success: true, decoded };
+
+  } catch (error) {
+    return { error: "Invalid token" };
+  }
+}
 
 async function authenticatePlayer(req, res, next) {
   const token = req.headers.authorization?.split(" ")[1];
@@ -99,12 +139,69 @@ async function authenticateTicTacToePlayer(req, res, next) {
   }
 }
 
+// socket io
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+app.get('/', (req, res) => {
+  res.sendFile(join(__dirname, 'index.html'));
+});
+
+io.on('connection', (socket) => {
+  console.log("A client connected:", socket.id);
+
+  socket.on("joinGame", (gameId) => {
+    socket.join(gameId);
+    console.log(`User joined game: ${gameId}`);
+  });
+
+  socket.on("make-ticTacToe-move", async ({ token, gameId, board, playerNames }) => {
+    console.log(token, gameId, board, playerNames, 'data received from client side');
+    
+    const authResult = await socket_authenticatePlayer(token, gameId, 'ticTacToe');
+
+    if (authResult.error) {
+      return socket.emit("unauthorized", { message: authResult.error });
+    }
+
+    const gameData = await ticTacToe_Online_Game.makeMove(board, gameId, playerNames);
+    console.log("Broadcasting updated game to room:", gameId, gameData);
+    io.to(gameId).emit("gameUpdated", gameData); // Broadcast to all users in the room
+  });
+
+  socket.on("disconnect", () => {
+    console.log("A user disconnected:", socket.id);
+  });
+});
+
+
+
+// io.on('connection', (socket) => {
+//   socket.on('chat message', (msg) => {
+//     io.emit('chat message', msg);
+//   });
+// });
+  // socket.on('disconnect', () => {
+  //       console.log('user disconnected');
+  //     });
+
+
+// io.on('connection', (socket) => {
+//   console.log('a user connected');
+//   socket.on('disconnect', () => {
+//     console.log('user disconnected');
+//   });
+// });
+
+server.listen(socketPort, () => {
+  console.log(`Real-Time server ${socketPort}`);
+});
+
 // connectFour
 
 app.get("/connectFour/gameboard", async (req, res) => {
   try {
     const document = await game.getAllData();
-    console.log(document, "database Document");
 
     if (document) {
       game.board = document.board;
@@ -149,16 +246,13 @@ app.put("/connectFour/move", async (req, res) => {
   const isDraw = game.isDraw();
   if (winner === "yellow") {
     games.yellowPlayer++;
-    console.log("yellow start over");
     await game.startOver();
   } else if (winner === "red") {
     games.redPlayer++;
-    console.log("red start over");
     await game.startOver();
   } else if (isDraw === true) {
     games.draw++;
     await game.startOver();
-    console.log("draw start over");
   }
 
   res.json({
@@ -172,8 +266,6 @@ app.put("/connectFour/move", async (req, res) => {
 
 app.put("/connectFour/player", (req, res) => {
   const playerNames = req.body;
-  console.log(playerNames);
-
   game.playerDatabase(playerNames);
 
   res.json(playerNames);
@@ -183,8 +275,6 @@ app.post("/connectFour/game", async (req, res) => {
   const { userEmail, rivalUserEmail, userName, rivalName } = req.body;
   const gameId = new ObjectId();
   const gameIdStringfy = gameId.toString();
-  console.log(gameId, "gameId, invitation sent");
-  console.log(gameIdStringfy, "id turned to a string");
 
   let playersId = {
     userId1: "yellow",
@@ -198,7 +288,6 @@ let gameType = 'connectFour'
     gameId,
     gameType
   );
-  console.log(invitedPlayerLink, "invitedPlayerLink");
 
   const data = {
     playerNames: {
@@ -254,11 +343,9 @@ let gameType = 'connectFour'
 });
 
 app.patch("/connectFour/game/:gameId", async (req, res) => {
-  console.log("patch handling for playerChallenged");
   const playerId = req.body;
   const gameId = req.params.gameId;
   await game_Online.newGameChallenge(playerId, gameId);
-  console.log("patch handling completed");
   res.json();
 });
 
@@ -283,12 +370,9 @@ app.get("/connectFour/:gameId", async (req, res) => {
     };
     playerNames = document.playerNames;
     emailAdress = document.emailAdress
-    console.log(emailAdress, 'get route')
     gameLinksWithTokens = document.gameLinksWithTokens
-    console.log(gameLinksWithTokens, 'get route')
     
     if (document.board) {
-      console.log(document);
       board = document.board;
       currentPlayer = document.currentPlayer;
       winner = document.winner;
@@ -296,7 +380,6 @@ app.get("/connectFour/:gameId", async (req, res) => {
       allTimeWinners = document.allTimeWinners;
       hasDraw = document.hasDraw;
       playerChallenged = document.playerChallenged;
-     console.log(document, 'data recived via get route')
     } else {
       const msg = {
         from: emailAdress.InvitedPlayer,
@@ -334,8 +417,6 @@ app.get("/connectFour/:gameId", async (req, res) => {
 app.put("/connectFour/:gameId/move", authenticatePlayer, async (req, res) => {
   const gameId = req.params.gameId;
   const { column } = req.body;
-  console.log(gameId, "gameId, server handling");
-
   const success = game_Online.makeMove(column, gameId);
 
   if (!success) {
@@ -352,7 +433,6 @@ app.patch('/connectFour/:gameId/startOver', async (req, res) => {
   if (!success) {
     return res.status(400).json({ error: "Error creating a new Match" });
   }
-  console.log('startOver succeded')
   res.json();
 })
 
@@ -367,18 +447,14 @@ app.get("/ticTacToe/gameData", async (req, res) => {
       allTimeScore: document.allTimeScore,
       gameBoard: document.gameBoard,
       playerNames: document.playerNames,
-    };
-    console.log(document.board, "database board");
+    }
   }
-  console.log(data, "Tic Tac Toe gameData ticTacToe/gameData");
 
   res.json(data);
 });
 
 app.put("/ticTacToe/move", async (req, res) => {
   const gameBoard = req.body;
-  console.log(gameBoard);
-
   await ticTacToe_Game.ticTacToeDataBase(gameBoard);
 
   res.json();
@@ -386,8 +462,6 @@ app.put("/ticTacToe/move", async (req, res) => {
 
 app.put("/ticTacToe/player", async (req, res) => {
   const { playerName, symbol } = req.body;
-  console.log(playerName, symbol);
-
   ticTacToe_Game.updatePlayerNames(playerName, symbol);
 
   res.json();
@@ -398,9 +472,7 @@ app.put("/ticTacToe/player", async (req, res) => {
 app.post("/ticTacToe/game", async (req, res) => {
   const { userEmail, rivalUserEmail, userName, rivalName } = req.body;
   const gameId = new ObjectId();
-  const gameIdStringfy = gameId.toString();
-  console.log(gameId, "gameId, invitation sent");
-  console.log(gameIdStringfy, "id turned to a string");
+  const gameIdStringfy = gameId.toString()
 
   let playersId = {
     userId1: "O",
@@ -414,7 +486,6 @@ app.post("/ticTacToe/game", async (req, res) => {
     gameId,
     gameType
   );
-  console.log(invitedPlayerLink, "invitedPlayerLink");
 
   const data = {
     playerNames: {
@@ -451,7 +522,7 @@ app.post("/ticTacToe/game", async (req, res) => {
   };
 
   try {
-    const transporter = await ticTacToe_Online_Game.sendMail()
+    const transporter = await game_Online.sendMail()
     await transporter.sendMail(msg);
     res.status(200).json({ gameId: gameIdStringfy });
   } catch (error) {
@@ -474,17 +545,15 @@ app.post("/ticTacToe/game", async (req, res) => {
 });
 
 app.get("/ticTacToe/:gameId", async (req, res) => {
-  console.log('gat route online tic tac toe running')
   const gameId = req.params.gameId;
   try {
     const document = await ticTacToe_Online_Game.getAllData(gameId);
-    console.log(document, 'data recieved get route')
     let board = [
       [null, null, null],
       [null, null, null],
       [null, null, null],
     ];
-    let playerNames 
+    let playerNames, turns
     let currentPlayer = "X";
     let winner;
     let hasDraw;
@@ -498,36 +567,16 @@ app.get("/ticTacToe/:gameId", async (req, res) => {
     };
     playerNames = document.playerNames;
     emailAdress = document.emailAdress
-    console.log(emailAdress, 'get route')
     gameLinksWithTokens = document.gameLinksWithTokens
-    console.log(gameLinksWithTokens, 'get route')
-    console.log(playerNames, 'pkayer names after update')
-    
     if (document.board) {
-      console.log(document);
       board = document.board;
       currentPlayer = document.currentPlayer;
       winner = document.winner;
       allTimeWinners = document.allTimeWinners;
       hasDraw = document.hasDraw;
       playerChallenged = document.playerChallenged;
-     console.log(document, 'data recived via get route')
-    } else {
-      const msg = {
-        from: emailAdress.InvitedPlayer,
-        to: emailAdress.invitingPlayer,
-        subject: `${playerNames.X} has accepted challenge!`,
-        text: `Hi ${playerNames.O},\n\n${playerNames.X} has accepted your challenge. Click the link below to join the match:\n\n${gameLinksWithTokens.O}\n\nGood luck!`,
-        html: `<p>Hi ${playerNames.O},</p> <p>${playerNames.X} has invited you to a game. Click the link below to join the match:</p><p><a href="${gameLinksWithTokens.O}">Join the Game</a></p><p>Good luck!</p>`,
-      };
-  
-        const transporter = await game_Online.sendMail()
-        const success = await transporter.sendMail(msg);
-  
-        if (!success) {
-          return res.status(400).json({ error: "Unable to send gameCreator link to game" });
-        }
-    }
+      turns = document.turns
+    } 
 
     res.json({
       board,
@@ -537,7 +586,9 @@ app.get("/ticTacToe/:gameId", async (req, res) => {
       hasDraw,
       playerChallenged,
       currentPlayer, 
-      gameLinksWithTokens
+      gameLinksWithTokens,
+      emailAdress,
+      turns
     });
   } catch (error) {
     console.error("Error handling request:", error);
@@ -553,28 +604,20 @@ app.patch("/ticTacToe/:gameId/move", authenticateTicTacToePlayer, async (req, re
     [null, null, null],
   ];
 
-  console.log(gameBoard, 'gameBoard patch route')
-  
-
   if (gameBoard) {
     board = gameBoard
   }
   const gameId = req.params.gameId;
-
-  console.log(board, 'gameBoard patch route')
-
-
   await ticTacToe_Online_Game.makeMove(board, gameId, playerNames);
 
   res.json(gameBoard);
 });
 
 app.patch("/ticTacToe/game/:gameId", async (req, res) => {
-  console.log("patch handling for playerChallenged");
   const playerId = req.body;
   const gameId = req.params.gameId;
   await ticTacToe_Online_Game.newGameChallenge(playerId, gameId);
-  console.log("patch handling completed");
+
   res.json();
 });
 
@@ -585,8 +628,27 @@ app.patch('/ticTacToe/:gameId/startOver', async (req, res) => {
   if (!success) {
     return res.status(400).json({ error: "Error creating a new Match" });
   }
-  console.log('startOver succeded')
   res.json();
+})
+
+app.post('/ticTacToe/sendMail', async (req,res) => {
+  const {playerNames, emailAdress, gameLinksWithTokens} = req.body
+  console.log(req.body, 'req.body data')
+  const msg = {
+    from: emailAdress.InvitedPlayer,
+    to: emailAdress.invitingPlayer,
+    subject: `${playerNames.X} has accepted your challenge!`,
+    text: `Hi ${playerNames.O},\n\n${playerNames.X} has accepted your challenge. Click the link below to join the match:\n\n${gameLinksWithTokens.invitingPlayer}\n\nGood luck!`,
+    html: `<p>Hi ${playerNames.O},</p> <p>${playerNames.X} accepted your challenge. Click the link below to join the match:</p><p><a href="${gameLinksWithTokens.invitingPlayer}">Join the Game</a></p><p>Good luck!</p>`,
+  };
+
+        const transporter = await game_Online.sendMail()
+        const success = await transporter.sendMail(msg);
+  
+        if (!success) {
+          return res.status(400).json({ error: "Unable to send gameCreator link to game" });
+        }
+        res.json()
 })
 
 app.listen(port, () => {

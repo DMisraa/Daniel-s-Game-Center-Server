@@ -1,19 +1,8 @@
-import nodemailer from "nodemailer";
 import { connectToTicTacToeGameId } from "../database.js";
 import WINNING_COMBINATIONS from "./WINNING_COMBINATIONS.js";
 
 let currentPlayer = 'X'
 export class TicTacToe_Online {
-  async sendMail() {
-    let transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: "danielmenahem90@gmail.com",
-        pass: "uuxr kpcg dnmg fxiu",
-      },
-    });
-    return transporter;
-  }
 
   async getGameDataById(gameId) {
     try {
@@ -124,12 +113,15 @@ export class TicTacToe_Online {
       turns: turns,
       board: gameBoard,
       winner: winner,
-      currentPlayer: currentPlayer
+      currentPlayer: currentPlayer,
+      playerNames
     };
 
     console.log(data, 'data sent to database, makeMove Fn')
 
     this.updateDatabase(gameId, data);
+
+    return data
   }
   deriveWinner(players, gameBoard) {
     let winner;
