@@ -64,11 +64,11 @@ export class TicTacToe_Online {
       const { gameCenterCollection, client } = await connectToTicTacToeGameId();
       await gameCenterCollection.updateOne(
         { _id: gameId },
-        { $set: playerChallenged }
+        { $set: { playerChallenged } }
       );
 
       await client.close();
-      return;
+      return playerChallenged
     } catch (error) {
       console.error(error);
     }

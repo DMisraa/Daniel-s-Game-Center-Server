@@ -155,6 +155,13 @@ io.on('connection', (socket) => {
     console.log(`User joined game: ${gameId}`);
   });
 
+ socket.on("initial_GET", async ({gameId}) => {
+    const gameData = await ticTacToe_Online_Game.getAllData(gameId);
+    console.log('Socket GET RUNNING')
+    console.log("Broadcasting initial Page to room:", gameId, gameData);
+    io.to(gameId).emit('initialPageLoad', gameData)
+  })
+
   socket.on("make-ticTacToe-move", async ({ token, gameId, board, playerNames }) => {
     console.log(token, gameId, board, playerNames, 'data received from client side');
     
@@ -169,10 +176,14 @@ io.on('connection', (socket) => {
     io.to(gameId).emit("initialPageLoad", gameData); // Broadcast to all users in the room
   });
 
-  socket.on("initial_GET", async ({gameId}) => {
-    const gameData = await ticTacToe_Online_Game.getAllData(gameId);
-    console.log('Socket GET RUNNING')
-    console.log("Broadcasting initial Page to room:", gameId, gameData);
+  socket.on('startOver_Req', async ({playerId, gameId}) => {
+    const playerChallenged = await ticTacToe_Online_Game.newGameChallenge(playerId, gameId);
+    console.log('startOver_Req gameData:', playerChallenged )
+    io.to(gameId).emit('newGameChallenge', playerChallenged)
+  })
+
+  socket.on('startOver', async ({gameId, players}) => {
+    const gameData = ticTacToe_Online_Game.startOver(gameId, players)
     io.to(gameId).emit('initialPageLoad', gameData)
   })
 
