@@ -139,13 +139,13 @@ async function authenticateTicTacToePlayer(req, res, next) {
   }
 }
 
-// socket io
+// Web Socket TicTacToe
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+// const __dirname = dirname(fileURLToPath(import.meta.url));
 
-app.get('/', (req, res) => {
-  res.sendFile(join(__dirname, 'index.html'));
-});
+// app.get('/', (req, res) => {
+//   res.sendFile(join(__dirname, 'index.html'));
+// });
 
 io.on('connection', (socket) => {
   console.log("A client connected:", socket.id);
@@ -189,29 +189,52 @@ io.on('connection', (socket) => {
     io.to(gameId).emit('initialPageLoad', gameData)
   })
 
+  // ConnectFour
+
+  socket.on("connectFour_Initial_GET", async ({gameId}) => {
+    const gameData = await game_Online.getAllData(gameId);
+    console.log('broadcasting startOver with:', gameData)
+    io.to(gameId).emit('connectFour_Initial', gameData)
+  })
+
+  socket.on("ConnectFourMove", async ({ column, gameId, token }) => {
+    console.log(token, gameId, column, 'data received from client side');
+    
+    const authResult = await socket_authenticatePlayer(token, gameId, 'connectFour');
+
+    if (authResult.error) {
+      return socket.emit("unauthorized", { message: authResult.error });
+    }
+
+    const gameData = await game_Online.makeMove(column, gameId);
+    console.log("Broadcasting updated game to room:", gameId, gameData);
+    io.to(gameId).emit("connectFour_Initial", gameData); // Broadcast to all users in the room
+  });
+
+  socket.on('ConnectFour_startOver_Req', async ({ playerId, gameId }) => {
+    const playerChallenged = await game_Online.newGameChallenge(playerId, gameId);
+    console.log('startOver_Req gameData:', playerChallenged )
+    io.to(gameId).emit('connectFour_Initial', playerChallenged)
+  })
+
+  socket.on('ConnectFour_startOver', async ({ gameId, yellowPlayerName, redPlayerName }) => {
+    const gameData = game_Online.startOver(gameId, yellowPlayerName, redPlayerName)
+    console.log('broadcasting startOver with:', gameData)
+    io.to(gameId).emit('connectFour_Initial', gameData)
+  })
+
   socket.on("disconnect", () => {
     console.log("A user disconnected:", socket.id);
   });
 });
 
+// Web Socket ConnectFour
+
+// socket.emit("connectFour_Initial_GET", { gameId });
+
+// socket.io('connectFour_Initial', (data) => {
 
 
-// io.on('connection', (socket) => {
-//   socket.on('chat message', (msg) => {
-//     io.emit('chat message', msg);
-//   });
-// });
-  // socket.on('disconnect', () => {
-  //       console.log('user disconnected');
-  //     });
-
-
-// io.on('connection', (socket) => {
-//   console.log('a user connected');
-//   socket.on('disconnect', () => {
-//     console.log('user disconnected');
-//   });
-// });
 
 server.listen(socketPort, () => {
   console.log(`Real-Time server ${socketPort}`);
@@ -371,7 +394,6 @@ app.patch("/connectFour/game/:gameId", async (req, res) => {
 
 app.get("/connectFour/:gameId", async (req, res) => {
   const gameId = req.params.gameId;
-  try {
     const document = await game_Online.getAllData(gameId);
 
     let board = Array.from({ length: 6 }, () => Array(7).fill(null));
@@ -400,21 +422,21 @@ app.get("/connectFour/:gameId", async (req, res) => {
       allTimeWinners = document.allTimeWinners;
       hasDraw = document.hasDraw;
       playerChallenged = document.playerChallenged;
-    } else {
-      const msg = {
-        from: emailAdress.InvitedPlayer,
-        to: emailAdress.invitingPlayer,
-        subject: `${playerNames.redPlayer} has accepted challenge!`,
-        text: `Hi ${playerNames.yellowPlayer},\n\n${playerNames.redPlayer} has accepted your challenge. Click the link below to join the match:\n\n${gameLinksWithTokens.invitingPlayer}\n\nGood luck!`,
-        html: `<p>Hi ${playerNames.yellowPlayer},</p> <p>${playerNames.redPlayer} has invited you to a game. Click the link below to join the match:</p><p><a href="${gameLinksWithTokens.invitingPlayer}">Join the Game</a></p><p>Good luck!</p>`,
-      };
+    // } else {
+    //   const msg = {
+    //     from: emailAdress.InvitedPlayer,
+    //     to: emailAdress.invitingPlayer,
+    //     subject: `${playerNames.redPlayer} has accepted challenge!`,
+    //     text: `Hi ${playerNames.yellowPlayer},\n\n${playerNames.redPlayer} has accepted your challenge. Click the link below to join the match:\n\n${gameLinksWithTokens.invitingPlayer}\n\nGood luck!`,
+    //     html: `<p>Hi ${playerNames.yellowPlayer},</p> <p>${playerNames.redPlayer} has invited you to a game. Click the link below to join the match:</p><p><a href="${gameLinksWithTokens.invitingPlayer}">Join the Game</a></p><p>Good luck!</p>`,
+    //   };
   
-        const transporter = await game_Online.sendMail()
-        const success = await transporter.sendMail(msg);
+        // const transporter = await game_Online.sendMail()
+        // const success = await transporter.sendMail(msg);
   
-        if (!success) {
-          return res.status(400).json({ error: "Unable to send gameCreator link to game" });
-        }
+        // if (!success) {
+        //   return res.status(400).json({ error: "Unable to send gameCreator link to game" });
+        // }
     }
 
     res.json({
@@ -428,10 +450,7 @@ app.get("/connectFour/:gameId", async (req, res) => {
       playerChallenged,
       gameLinksWithTokens
     });
-  } catch (error) {
-    console.error("Error handling request:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
+ 
 });
 
 app.put("/connectFour/:gameId/move", authenticatePlayer, async (req, res) => {

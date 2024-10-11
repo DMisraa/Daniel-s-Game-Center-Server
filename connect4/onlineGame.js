@@ -154,7 +154,7 @@ export class Connect4_Online {
         );
   
         await client.close();
-        return;
+        return playerChallenged
       } catch (error) {
         console.error(error);
       }
