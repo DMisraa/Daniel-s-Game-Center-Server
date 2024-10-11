@@ -179,11 +179,13 @@ io.on('connection', (socket) => {
   socket.on('startOver_Req', async ({playerId, gameId}) => {
     const playerChallenged = await ticTacToe_Online_Game.newGameChallenge(playerId, gameId);
     console.log('startOver_Req gameData:', playerChallenged )
-    io.to(gameId).emit('newGameChallenge', playerChallenged)
+    io.to(gameId).emit('initialPageLoad', playerChallenged)
   })
 
   socket.on('startOver', async ({gameId, players}) => {
-    const gameData = ticTacToe_Online_Game.startOver(gameId, players)
+    await ticTacToe_Online_Game.startOver(gameId, players)
+    const gameData = await ticTacToe_Online_Game.getAllData(gameId)
+    console.log('broadcasting startOver with:', gameData)
     io.to(gameId).emit('initialPageLoad', gameData)
   })
 
