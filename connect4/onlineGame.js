@@ -60,10 +60,13 @@ export class Connect4_Online {
           currentPlayer = currentPlayer === "red" ? "yellow" : "red";
         }
         console.log(winner, "makeMove winner");
+        if (gameTurns === 42) {
+          hasDraw = true
+        }
         console.log(hasDraw, "makeMove draw");
         if (!winner && !hasDraw) {
           console.log("makeMove, database Fn running");
-          this.dataBase(gameId, allTimeWinners);
+          this.dataBase(gameId, allTimeWinners, playerNames);
           
         } else {
           if (winner === playerNames.yellowPlayer) {
@@ -76,7 +79,7 @@ export class Connect4_Online {
             data.allTimeWinners.draw++;
             data.hasDraw = true
           }
-          this.dataBase(gameId, allTimeWinners, playerNames);
+          this.dataBase(gameId, allTimeWinners, playerNames, hasDraw);
           console.log(winner, "winner makeMove Fn");
         }
         data.currentPlayer = currentPlayer
@@ -90,7 +93,7 @@ export class Connect4_Online {
     return false;
   }
 
-  async dataBase(gameId, allTimeWinners) {
+  async dataBase(gameId, allTimeWinners, playerNames, hasDraw = null) {
     console.log(gameId, "gameId DataBase Fn ");
     const data = {
       board: board,
