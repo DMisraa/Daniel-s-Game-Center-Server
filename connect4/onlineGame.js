@@ -4,7 +4,7 @@ import nodemailer from "nodemailer"
 
 let board = Array.from({ length: 6 }, () => Array(7).fill(null));
 let currentPlayer = "red";
-let winner;
+let winner, data
 let playerNames;
 let gameTurns = 0;
 let allTimeWinners;
@@ -26,25 +26,24 @@ export class Connect4_Online {
     }
   }
   async makeMove(column, gameId) {
-    const gameData = await this.getGameDataById(gameId);
-    console.log(gameId, "gameId, makeMove Fn");
+    data = await this.getGameDataById(gameId);
     allTimeWinners = {
         yellowPlayer: 0,
         redPlayer: 0,
         draw: 0,
       };
-    playerNames = gameData.playerNames;
-    if (gameData.board) {
-      board = gameData.board;
-      currentPlayer = gameData.currentPlayer;
-      winner = gameData.winner;
-      gameTurns = gameData.gameTurns;
-      allTimeWinners = gameData.allTimeWinners;
-      hasDraw = gameData.hasDraw
+    playerNames = data.playerNames;
+    if (data.board) {
+      board = data.board;
+      currentPlayer = data.currentPlayer;
+      winner = data.winner;
+      gameTurns = data.gameTurns;
+      allTimeWinners = data.allTimeWinners;
+      hasDraw = data.hasDraw
       playersId = playersId;
       emailAdress = {
-        yellow: gameData.invitingPlayer,
-        red: gameData.invitedPlayer,
+        yellow: data.invitingPlayer,
+        red: data.invitedPlayer,
       };
     }
 
@@ -65,21 +64,24 @@ export class Connect4_Online {
         if (!winner && !hasDraw) {
           console.log("makeMove, database Fn running");
           await this.dataBase(gameId, allTimeWinners);
+          data.currentPlayer = currentPlayer
+          data.gameTurns = gameTurns
         } else {
           if (winner === playerNames.yellowPlayer) {
             allTimeWinners.yellowPlayer++;
-            console.log("yellow start over");
+            winner = playerNames.yellowPlayer
           } else if (winner === playerNames.redPlayer) {
             allTimeWinners.redPlayer++;
-            console.log("red start over");
+            winner = playerNames.yellowPlayer
           } else if (hasDraw === true) {
             allTimeWinners.draw++;
-            console.log("draw start over");
+            hasDraw = true
           }
-          await this.dataBase(gameId, allTimeWinners, playerNames);
+          data = await this.dataBase(gameId, allTimeWinners, playerNames);
           console.log(winner, "winner makeMove Fn");
         }
-        return true;
+        console.log('makeMove data:', data)
+        return data;
       }
     }
     return false;
@@ -106,13 +108,13 @@ export class Connect4_Online {
       );
 
       await client.close();
-      return;
+      return data
     } catch (error) {
       console.error(error);
     }
   }
 
-  async startOver(gameId, yellowPlayerName, redPlayerName) {
+  async startOver(gameId, yellowPlayerName, redPlayerName, allTimeWinners) {
     console.log(winner, ", winner log startover Fn");
 
     board = Array.from({ length: 6 }, () => Array(7).fill(null));
@@ -127,7 +129,8 @@ export class Connect4_Online {
         redPlayer: redPlayerName
       },
       hasDraw: null,
-      playerChallenged: null
+      playerChallenged: null,
+      allTimeWinners: allTimeWinners
     };
     console.log(data, "startover Document");
     console.log(gameId, 'gameId startover Fn')
@@ -141,16 +144,17 @@ export class Connect4_Online {
       console.error(error);
     }
 
-    return;
+    return data
   }
 
   async newGameChallenge(playerId, gameId) {  
     const playerChallenged = playerId
+    console.log('newGameChallenge, playerChallenged data:', playerChallenged)
     try {
         const { gameCenterCollection, client } = await connectToGameIdDatabase();
         await gameCenterCollection.updateOne(
           { _id: gameId },
-          { $set:  playerChallenged },
+          { $set:  { playerChallenged } },
         );
   
         await client.close();

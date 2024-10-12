@@ -207,7 +207,7 @@ io.on('connection', (socket) => {
     }
 
     const gameData = await game_Online.makeMove(column, gameId);
-    console.log("Broadcasting updated game to room:", gameId, gameData);
+    console.log("Broadcasting ConnectFourMove:", gameData);
     io.to(gameId).emit("connectFour_Initial", gameData); // Broadcast to all users in the room
   });
 
@@ -217,8 +217,8 @@ io.on('connection', (socket) => {
     io.to(gameId).emit('connectFour_Initial', playerChallenged)
   })
 
-  socket.on('ConnectFour_startOver', async ({ gameId, yellowPlayerName, redPlayerName }) => {
-    const gameData = game_Online.startOver(gameId, yellowPlayerName, redPlayerName)
+  socket.on('ConnectFour_startOver', async ({ gameId, yellowPlayerName, redPlayerName, allTimeWinners}) => {
+    const gameData = await game_Online.startOver(gameId, yellowPlayerName, redPlayerName, allTimeWinners)
     console.log('broadcasting startOver with:', gameData)
     io.to(gameId).emit('connectFour_Initial', gameData)
   })
