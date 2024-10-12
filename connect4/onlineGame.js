@@ -104,7 +104,7 @@ export class Connect4_Online {
     console.log(data, "dataBase data sent");
     try {
       const { gameCenterCollection, client } = await connectToGameIdDatabase();
-      gameCenterCollection.updateOne(
+      await gameCenterCollection.updateOne(
         { _id: gameId },
         { $set: data },
         { upsert: true }
