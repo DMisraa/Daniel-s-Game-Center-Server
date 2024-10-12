@@ -63,23 +63,26 @@ export class Connect4_Online {
         console.log(hasDraw, "makeMove draw");
         if (!winner && !hasDraw) {
           console.log("makeMove, database Fn running");
-          await this.dataBase(gameId, allTimeWinners);
-          data.currentPlayer = currentPlayer
-          data.gameTurns = gameTurns
+          this.dataBase(gameId, allTimeWinners);
+          
         } else {
           if (winner === playerNames.yellowPlayer) {
             allTimeWinners.yellowPlayer++;
-            winner = playerNames.yellowPlayer
+            data.winner = playerNames.yellowPlayer
           } else if (winner === playerNames.redPlayer) {
             allTimeWinners.redPlayer++;
-            winner = playerNames.yellowPlayer
+            data.winner = playerNames.redPlayer
           } else if (hasDraw === true) {
-            allTimeWinners.draw++;
-            hasDraw = true
+            data.allTimeWinners.draw++;
+            data.hasDraw = true
           }
-          data = await this.dataBase(gameId, allTimeWinners, playerNames);
+          this.dataBase(gameId, allTimeWinners, playerNames);
           console.log(winner, "winner makeMove Fn");
         }
+        data.currentPlayer = currentPlayer
+          data.gameTurns = gameTurns
+          data.allTimeWinners = allTimeWinners
+          data.board = board
         console.log('makeMove data:', data)
         return data;
       }
