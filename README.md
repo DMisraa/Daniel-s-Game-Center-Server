@@ -56,4 +56,19 @@ The server uses WebSocket (Socket.IO) for real-time events. Below are the main e
   </ul>
 </ul>
 
+<h2> API Endpoints </h2>
+
+The server also provides RESTful API endpoints:
+
+<ul>
+<li> <code>POST /game/invite</code> </li> 
+Invites a player to join a game. Generates a link with a token for secure access. </ul>
+
+<ul>
+<li> <code>GET /game/:gameId/status</code> </li>
+Retrieves the status of a game, including current turn, board state, and scores. </ul>
+
+<ul>
+<li> <code>POST /game/:gameId/move</code> </li>
+Submits a player’s move. Validates the token before processing. </ul>
 
