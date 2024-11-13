@@ -12,6 +12,14 @@ This is the back-end server for the Game Center project. It supports real-time g
 <li> Cross-origin support: Configured to work with the Game Center front end. </li>
 </ul>
 
+<h2> Technologies </h2>
+<ul>
+<li> Node.js </li>
+<li> Express.js </li>
+<li> WebSocket (Socket.IO) </li>
+<li> MongoDB </li>
+<li> JSON Web Token (JWT) for authentication </li>
+</ul>
 
 <h2> WebSocket Events </h2>
 
@@ -47,3 +55,5 @@ The server uses WebSocket (Socket.IO) for real-time events. Below are the main e
 <li> Payload: <code>{ gameId: String, playerId: String, move: { column: Number } }</code> </li>
   </ul>
 </ul>
+
+
