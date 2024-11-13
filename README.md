@@ -19,8 +19,8 @@ The server uses WebSocket (Socket.IO) for real-time events. Below are the main e
 <ul>
 <li> joinRoom </li> 
 <ul> 
-** <li> Description: Joins a game room based on game ID. </li> **
-<li> Payload: { gameId: String } </li>
+<li> Description: Joins a game room based on game ID. </li>
+<li> Payload: `{ gameId: String }` </li>
   </ul>
 </ul>
 
