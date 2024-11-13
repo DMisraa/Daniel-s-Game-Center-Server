@@ -17,7 +17,7 @@ This is the back-end server for the Game Center project. It supports real-time g
 
 The server uses WebSocket (Socket.IO) for real-time events. Below are the main events and their payloads:
 <ul>
-<ul> <li> joinRoom </li> </ul>
+<ul>  joinRoom </ul>
 
 <li> Description: Joins a game room based on game ID. </li>
 <li> Payload: { gameId: String } </li>
