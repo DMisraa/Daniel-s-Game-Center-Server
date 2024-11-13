@@ -17,23 +17,23 @@ This is the back-end server for the Game Center project. It supports real-time g
 
 The server uses WebSocket (Socket.IO) for real-time events. Below are the main events and their payloads:
 <ul>
-<li> joinRoom </li> 
+<li> <code>joinRoom</code> </li> 
 <ul> 
 <li> Description: Joins a game room based on game ID. </li>
-<li> Payload: <code> { gameId: String } </code> </li>
+<li> Payload: <code>{ gameId: String }</code> </li>
   </ul>
 </ul>
 
 <ul>
-<li> initial_GET </li> 
+<code><li> initial_GET </li></code> 
 <ul> 
 <li> Description: Request to retrieve initial game data for a player. </li>
-<li> Payload: { gameId: String } </li>
+<li> Payload: <code>{ gameId: String }</code> </li>
   </ul>
 </ul>
 
 <ul>
-<li> ticTacToeMove </li> 
+<code> <li> ticTacToeMove </li> </code> 
 <ul> 
 <li> Description: Handles a Tic-Tac-Toe move by a player after validating the token.</li>
 <li> Payload: { gameId: String, playerId: String, move: { row: Number, col: Number } } </li>
