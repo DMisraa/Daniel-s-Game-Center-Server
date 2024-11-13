@@ -72,3 +72,8 @@ Retrieves the status of a game, including current turn, board state, and scores.
 <li> <code>POST /game/:gameId/move</code> </li>
 Submits a player’s move. Validates the token before processing. </ul>
 
+<h3> Connecting to the Vercel Frontend </h3>
+
+The Game Center front end is deployed on Vercel, with the backend on Railway. CORS settings are configured to allow cross-origin requests seamlessly between the frontend and backend, ensuring a smooth and responsive gaming experience.
+
+
