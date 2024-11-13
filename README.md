@@ -24,16 +24,26 @@ The server uses WebSocket (Socket.IO) for real-time events. Below are the main e
   </ul>
 </ul>
 
+<ul>
+<li> initial_GET </li> 
+<ul> 
+<li> Description: Request to retrieve initial game data for a player. </li>
+<li> Payload: { gameId: String } </li>
+  </ul>
+</ul>
 
-initial_GET
+<ul>
+<li> ticTacToeMove </li> 
+<ul> 
+<li> Description: Handles a Tic-Tac-Toe move by a player after validating the token.</li>
+<li> Payload: { gameId: String, playerId: String, move: { row: Number, col: Number } } </li>
+  </ul>
+</ul>
 
-Description: Request to retrieve initial game data for a player.
-Payload: { gameId: String }
-ticTacToeMove
-
-Description: Handles a Tic-Tac-Toe move by a player after validating the token.
-Payload: { gameId: String, playerId: String, move: { row: Number, col: Number } }
-connectFourMove
-
-Description: Processes a Connect Four move by a player.
-Payload: { gameId: String, playerId: String, move: { column: Number } }
+<ul>
+<li> connectFourMove </li> 
+<ul> 
+<li> Description: Processes a Connect Four move by a player. </li>
+<li> Payload: { gameId: String, playerId: String, move: { column: Number } } </li>
+  </ul>
+</ul>
