@@ -3,7 +3,7 @@
 This is the back-end server for the Game Center project. It supports real-time gameplay features and handles player authentication, game state management, and WebSocket communication for games like Tic-Tac-Toe and Connect Four.
 
 
-<h2> Features </h2>
+<h2> ✨ Features </h2>
 <ul>
 <li> Real-time gameplay: Enables real-time updates for games using WebSockets, so players can see moves instantly. </li>
 <li> Token-based authentication: Secure token-based system to verify player actions and access control. </li>
@@ -21,7 +21,7 @@ This is the back-end server for the Game Center project. It supports real-time g
 <li> JSON Web Token (JWT) for authentication </li>
 </ul>
 
-<h2> WebSocket Events </h2>
+<h2> 📡 WebSocket Events </h2>
 
 The server uses WebSocket (Socket.IO) for real-time events. Below are the main events and their payloads:
 <ul>
@@ -56,7 +56,7 @@ The server uses WebSocket (Socket.IO) for real-time events. Below are the main e
   </ul>
 </ul>
 
-<h2> API Endpoints </h2>
+<h2> 📚 API Documentation </h2>
 
 The server also provides RESTful API endpoints:
 
@@ -72,7 +72,7 @@ Retrieves the status of a game, including current turn, board state, and scores.
 <li> <code>POST /game/:gameId/move</code> </li>
 Submits a player’s move. Validates the token before processing. </ul>
 
-<h2> Connecting to the Vercel Frontend </h2>
+<h2> 🌐 Connecting to the Vercel Frontend </h2>
 
 The Game Center front end is deployed on Vercel, with the backend on Railway. CORS settings are configured to allow cross-origin requests seamlessly between the frontend and backend, ensuring a smooth and responsive gaming experience.
 
