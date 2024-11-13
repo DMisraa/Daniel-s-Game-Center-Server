@@ -12,7 +12,7 @@ This is the back-end server for the Game Center project. It supports real-time g
 <li> Cross-origin support: Configured to work with the Game Center front end. </li>
 </ul>
 
-<h2> Technologies </h2>
+<h2> 🛠️ Technologies </h2>
 <ul>
 <li> Node.js </li>
 <li> Express.js </li>
