@@ -8,7 +8,6 @@ export class TicTacToe_Online {
     try {
       const { gameCenterCollection, client } = await connectToTicTacToeGameId();
       const gameData = await gameCenterCollection.findOne({ _id: gameId });
-      console.log('gameId fethced', gameId)
       await client.close();
       return gameData;
     } catch (error) {
@@ -19,7 +18,6 @@ export class TicTacToe_Online {
   async getAllData(gameId) {
     try {
       const { gameCenterCollection, client } = await connectToTicTacToeGameId();
-
       const document = await gameCenterCollection.findOne({ _id: gameId });
       await client.close();
       return document;
@@ -32,31 +30,17 @@ export class TicTacToe_Online {
   async updateDatabase(gameId, data) {
     try {
       const { gameCenterCollection, client } = await connectToTicTacToeGameId();
-
       const document = await gameCenterCollection.updateOne(
         { _id: gameId },
         { $set: data }
       );
-      await client.close();
+      client.close();
       return document;
     } catch (error) {
       console.error("Error updating docs:", error);
       throw error;
     }
   }
-
-  //   async getGameDataById(gameId) {
-  //     try {
-  //       const { gameCenterCollection, client } = await connectToTicTacToeGameId();
-  //       const gameData = await gameCenterCollection.findOne({ _id: gameId });
-  //       console.log('gameId fethced', gameId)
-  //       await client.close();
-  //       return gameData;
-  //     } catch (error) {
-  //       console.error("Error fetching game data by ID:", error);
-  //       throw error;
-  //     }
-  //   }
 
   async newGameChallenge(playerId, gameId) {
     const playerChallenged = playerId;
@@ -75,34 +59,28 @@ export class TicTacToe_Online {
   }
 
   async makeMove(gameBoard, gameId, playerNames) {
+
     const gameData = await this.getAllData(gameId);
-    
     let allTimeScore = gameData.allTimeWinners;
     let turns = gameData.turns;
-
     const winner = this.deriveWinner(playerNames, gameBoard);
     const hasDraw = turns === 9 && !winner;
-    console.log(playerNames, "player names makemove Fn");
-    console.log(currentPlayer, 'player playing, makeMove Fn')
+
     if (!winner) {
         currentPlayer = currentPlayer === "X" ? "O" : "X";
         console.log('changeActivePlayer running')
       }
-      console.log(currentPlayer, 'next player playing, makeMove Fn')
 
     if (winner || hasDraw) {
       if (winner === playerNames.X) {
-        console.log("player X winner");
         allTimeScore.X++;
         turns = 0;
       } else if (winner === playerNames.O) {
         allTimeScore.O++;
         turns = 0;
-        console.log("player O winner");
       } else if (hasDraw) {
         allTimeScore.Draw++;
         turns = 0;
-        console.log("Draw set new game");
       }
     }
 
@@ -117,16 +95,12 @@ export class TicTacToe_Online {
       playerNames
     };
 
-    console.log(data, 'data sent to database, makeMove Fn')
-
     this.updateDatabase(gameId, data);
 
     return data
   }
   deriveWinner(players, gameBoard) {
     let winner;
-
-    console.log(gameBoard, " gameBoard, deriveWinner Fn");
 
     for (const combination of WINNING_COMBINATIONS) {
       const firstSquareSymbole =
@@ -164,8 +138,6 @@ export class TicTacToe_Online {
       hasDraw: false,
       playerChallenged: null,
     };
-    console.log(data, "startover Document");
-    console.log(gameId, "gameId startover Fn");
 
     try {
       const { gameCenterCollection, client } = await connectToTicTacToeGameId();
@@ -175,7 +147,6 @@ export class TicTacToe_Online {
     } catch (error) {
       console.error(error);
     }
-
     return;
   }
 }

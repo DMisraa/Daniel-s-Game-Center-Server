@@ -17,7 +17,6 @@ export class Connect4_Online {
     try {
       const { gameCenterCollection, client } = await connectToGameIdDatabase();
       const gameData = await gameCenterCollection.findOne({ _id: gameId });
-      console.log('gameId fethced', gameId)
       await client.close();
       return gameData;
     } catch (error) {
@@ -48,7 +47,7 @@ export class Connect4_Online {
     }
 
     if (column < 0 || column >= 7 || board[0][column] !== null || winner) {
-      return false; // Invalid move
+      return false; 
     }
 
     for (let row = 5; row >= 0; row--) {
@@ -59,13 +58,10 @@ export class Connect4_Online {
         if (!winner) {
           currentPlayer = currentPlayer === "red" ? "yellow" : "red";
         }
-        console.log(winner, "makeMove winner");
         if (gameTurns === 42) {
           hasDraw = true
         }
-        console.log(hasDraw, "makeMove draw");
         if (!winner && !hasDraw) {
-          console.log("makeMove, database Fn running");
           this.dataBase(gameId, allTimeWinners, playerNames);
           
         } else {
@@ -80,13 +76,12 @@ export class Connect4_Online {
             data.hasDraw = true
           }
           this.dataBase(gameId, allTimeWinners, playerNames, hasDraw);
-          console.log(winner, "winner makeMove Fn");
         }
         data.currentPlayer = currentPlayer
           data.gameTurns = gameTurns
           data.allTimeWinners = allTimeWinners
           data.board = board
-        console.log('makeMove data:', data)
+
         return data;
       }
     }
@@ -94,7 +89,7 @@ export class Connect4_Online {
   }
 
   async dataBase(gameId, allTimeWinners, playerNames, hasDraw = null) {
-    console.log(gameId, "gameId DataBase Fn ");
+  
     const data = {
       board: board,
       currentPlayer: currentPlayer,
@@ -104,7 +99,7 @@ export class Connect4_Online {
       gameTurns: gameTurns,
       hasDraw: hasDraw
     };
-    console.log(data, "dataBase data sent");
+ 
     try {
       const { gameCenterCollection, client } = await connectToGameIdDatabase();
       await gameCenterCollection.updateOne(
@@ -121,8 +116,6 @@ export class Connect4_Online {
   }
 
   async startOver(gameId, yellowPlayerName, redPlayerName, allTimeWinners) {
-    console.log(winner, ", winner log startover Fn");
-
     board = Array.from({ length: 6 }, () => Array(7).fill(null));
 
     const data = {
@@ -138,24 +131,20 @@ export class Connect4_Online {
       playerChallenged: null,
       allTimeWinners: allTimeWinners
     };
-    console.log(data, "startover Document");
-    console.log(gameId, 'gameId startover Fn')
 
     try {
       const { gameCenterCollection, client } = await connectToGameIdDatabase();
-
       await gameCenterCollection.updateOne({ _id: gameId }, { $set: data });
       await client.close();
     } catch (error) {
       console.error(error);
     }
-
     return data
   }
 
   async newGameChallenge(playerId, gameId) {  
     const playerChallenged = playerId
-    console.log('newGameChallenge, playerChallenged data:', playerChallenged)
+   
     try {
         const { gameCenterCollection, client } = await connectToGameIdDatabase();
         await gameCenterCollection.updateOne(
@@ -180,7 +169,7 @@ export class Connect4_Online {
         player === board[c.row][c.column] &&
         player === board[d.row][d.column]
       ) {
-        console.log(player, "winning player - checkForWinner Fn");
+  
         if (player === 'red') {
             winner = playerNames.redPlayer
         } else if (player === 'yellow') {
@@ -195,7 +184,6 @@ export class Connect4_Online {
   async getAllData(gameId) {
     try {
       const { gameCenterCollection, client } = await connectToGameIdDatabase();
-
       const document = await gameCenterCollection.findOne({ _id: gameId });
       await client.close();
       return document;

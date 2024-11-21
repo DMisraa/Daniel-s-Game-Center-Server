@@ -1,5 +1,4 @@
 import { winningCombinations } from "./WINNING_COMBINATIONS.js";
-
 import { games } from "../server.js";
 import { connectToDatabase } from "../database.js";
 
@@ -12,7 +11,7 @@ export class Connect4 {
     this.gameId = "p1"
     this.hasDraw = false
     this.playerNames = {
-      yellowPlayer: "Yellow Player",
+      bluePlayer: "Blue Player",
       redPlayer: "Red Player",
     };
   }
@@ -29,8 +28,6 @@ export class Connect4 {
   }
 
   async startOver() {
-    console.log(this.winner, ", winner log startover Fn");
-
     this.board = Array.from({ length: 6 }, () => Array(7).fill(null));
     this.winner = null;
     this.turns = 0
@@ -43,7 +40,6 @@ export class Connect4 {
       allTimeWinners: games,
       turnLength: this.turns
     };
-    console.log(data, 'startover Document')
 
     try {
       const { gameCenterCollection, client } = await connectToDatabase();
@@ -51,20 +47,17 @@ export class Connect4 {
       await gameCenterCollection.updateOne(
         { _id: this.gameId },
         { $set: data },
-        console.log(data, 'data sent')
       );
     await client.close();
     } catch (error) {
       console.error(error);
     }
-
     return;
   }
 
   async playerDatabase(playerNames) {
     try {
       const { gameCenterCollection, client } = await connectToDatabase();
-     
       await gameCenterCollection.updateOne(
         { _id: this.gameId },
         { $set: { playerNames } }
@@ -76,7 +69,6 @@ export class Connect4 {
     }
   }
   async dataBase() {
-
     const draw = this.turns === 42 && !this.winner;
     
     const data = {
@@ -104,7 +96,6 @@ export class Connect4 {
   }
 
   async getAllData() {
-   
     try {
       const { gameCenterCollection, client } = await connectToDatabase();
 
@@ -127,7 +118,6 @@ export class Connect4 {
         player === this.board[c.row][c.column] &&
         player === this.board[d.row][d.column]
       ) {
-        console.log(player, 'winning player - checkForWinner Fn')
         this.winner = player;
         return player;
       }

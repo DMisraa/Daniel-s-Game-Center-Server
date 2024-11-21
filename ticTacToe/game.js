@@ -31,7 +31,6 @@ export class TicTacToe {
   }
   deriveWinner(players, gameBoard) {
     let winner;
-    console.log(gameBoard, 'gameBoard, deriveWinner Fn')
 
     for (const combination of WINNING_COMBINATIONS) {
       const firstSquareSymbole =
@@ -56,7 +55,6 @@ export class TicTacToe {
    
     try {
       const { gameCenterCollection, client } = await connectToTicTacToeDatabase();
-
       const document = await gameCenterCollection.findOne({});
       await client.close();
       return document;
@@ -68,8 +66,6 @@ export class TicTacToe {
 
   async ticTacToeDataBase(gameBoard) {
     this.turns++
-    console.log(this.turns)
-    console.log(gameBoard, 'board ticTacToeDataBase')
 
     let data = {
       gameBoard,
@@ -83,25 +79,19 @@ export class TicTacToe {
         O: allTimeScore.O
       }
     };
-
-    console.log(data.gameBoard, 'gameBoard, ticTacToeDataBase')
-
     const winner = this.deriveWinner(this.playerNames, data.gameBoard);
     const hasDraw = this.turns === 9 && !winner
 
     if (winner || hasDraw) {
       if ((winner === this.playerNames.X)) {
-        console.log('player X winner')
         allTimeScore.X++;
         this.turns = 0
       } else if ((winner === this.playerNames.O)) {
         allTimeScore.O++;
         this.turns = 0
-        console.log('player O winner')
       } else if (hasDraw) {
         allTimeScore.Draw++;
         this.turns = 0
-        console.log('Draw set new game')
       }
 
        data = {
@@ -126,13 +116,11 @@ export class TicTacToe {
         { _id: this.gameId },
         { $set: data },
         { upsert: true },
-        console.log(data, "Tic Tac Toe data sent to dataBase")
       );
       await client.close();
     } catch (error) {
       console.error(error);
     }
-
     return;
   }
 
@@ -153,13 +141,11 @@ export class TicTacToe {
       await gameCenterCollection.updateOne(
         { _id: this.gameId },
         { $set: data },
-        console.log(data, "Tic Tac Toe player update")
       );
       await client.close();
     } catch (error) {
       console.error(error);
     }
-
     return;
   }
 }
