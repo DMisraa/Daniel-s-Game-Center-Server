@@ -32,7 +32,12 @@ import {
 const app = express();
 const port = 4000;
 
-app.use(cors());
+
+app.use(cors({
+  origin: process.env.BASE_URL,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+  credentials: true,
+}));
 app.use(bodyParser.json());
 
 export let games = {
