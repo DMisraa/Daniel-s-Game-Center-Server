@@ -52,6 +52,9 @@ export let games = {
   draw: 0,
 };
 
+console.log("CORS Allowed Origin:", process.env.BASE_URL);
+
+
 // connectFour
 
 app.get("/connectFour/gameboard", getData);
