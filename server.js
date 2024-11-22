@@ -31,13 +31,19 @@ import {
 
 const app = express();
 const port = 4000;
-
+const allowedOrigins = process.env.BASE_URL
 
 app.use(cors({
-  origin: process.env.BASE_URL,
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
-}));
+})
+);
 app.use(bodyParser.json());
 
 export let games = {
