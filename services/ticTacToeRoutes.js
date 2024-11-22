@@ -11,6 +11,7 @@ const game_Online = new Connect4_Online();
 
 
 export const ticTacToe_getData = async (req, res) => {
+    console.log("CORS Allowed Origin:", process.env.BASE_URL);
     let data;
     const document = await ticTacToe_Game.getAllData();
   
