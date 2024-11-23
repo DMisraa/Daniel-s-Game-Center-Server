@@ -47,49 +47,11 @@ app.use(bodyParser.json());
 
 // connectFour
 
-app.get("/connectFour/gameboard", getData);
+app.get('/', (req, res) => {
+  res.send('Hello World!');
+});
 
-app.put("/connectFour/move", playerMove);
 
-app.put("/connectFour/player", editPlayerName);
-
-app.post("/connectFour/game", gameInvite);
-
-app.patch("/connectFour/game/:gameId", newGameChallenge);
-
-app.get("/connectFour/:gameId", getOnlineGameData);
-
-app.put("/connectFour/:gameId/move", authenticatePlayer, onlineGame_PlayerMove);
-
-app.patch("/connectFour/:gameId/startOver", onlineGame_startOver);
-
-// Tic _ Tac _ Toe
-
-app.get("/ticTacToe/gameData", ticTacToe_getData);
-
-app.put("/ticTacToe/move", ticTacToe_playerMove);
-
-app.put("/ticTacToe/player", ticTacToe_editPlayerName);
-
-// online game
-
-app.post("/ticTacToe/game", ticTacToe_gameInvite);
-
-app.get("/ticTacToe/:gameId", onlineGame_getData);
-
-app.patch(
-  "/ticTacToe/:gameId/move",
-  authenticateTicTacToePlayer,
-  onlineGame_getData
-);
-
-app.patch("/ticTacToe/game/:gameId", ticTacToe_newGameChallenge);
-
-app.patch("/ticTacToe/:gameId/startOver", startOver);
-
-app.post("/ticTacToe/sendMail", sendMail);
-
-app.post("/footerContact", footer);
 
 app.listen(port, () => {
   console.log(`Connect 4 server running on port ${port}`);
