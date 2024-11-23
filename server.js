@@ -31,7 +31,7 @@ import {
 } from "./services/ticTacToeRoutes.js";
 
 const app = express();
-const port = process.env.PORT || 4000;
+const port = 4000
  
 dotenv.config();
 console.log("Process Env PORT:", process.env.PORT);
@@ -52,6 +52,8 @@ app.get("/connectFour/gameboard", getData);
 app.put("/connectFour/move", playerMove);
 
 app.put("/connectFour/player", editPlayerName);
+
+// online game
 
 app.post("/connectFour/game", gameInvite);
 

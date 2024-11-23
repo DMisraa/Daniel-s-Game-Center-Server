@@ -12,6 +12,7 @@ export let games = {
 };
 
 export const getData = async (req, res) => {
+  console.log('connectfour get running')
     try {
       const document = await game.getAllData();
   
@@ -23,7 +24,9 @@ export const getData = async (req, res) => {
         game.playerNames = document.playerNames;
         games = document.allTimeWinners;
         game.turns = document.turnLength
-      } 
+      } else {
+        return null
+      }
   
       res.json({
         board: game.board,
@@ -41,6 +44,7 @@ export const getData = async (req, res) => {
   }
 
   export const playerMove = async (req, res) => {
+    console.log('connectfour move running')
     const { column } = req.body;
     const success = game.makeMove(column);
   
