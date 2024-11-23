@@ -31,8 +31,7 @@ import {
 } from "./services/ticTacToeRoutes.js";
 
 const app = express();
-{process.env.SERVER_PORT ? port = process.env.SERVER_PORT : port = 4000}
-
+const port = 4000
  
 dotenv.config();
 const allowedOrigins = process.env.BASE_URL
