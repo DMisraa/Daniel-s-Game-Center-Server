@@ -1,16 +1,15 @@
 import { ObjectId } from "mongodb";
-
 import { Connect4 } from "../connect4/game.js";
 import { Connect4_Online } from "../connect4/onlineGame.js";
 
 const game = new Connect4();
 const game_Online = new Connect4_Online();
 
-let games = {
-    yellowPlayer: 0,
-    redPlayer: 0,
-    draw: 0,
-  };
+export let games = {
+  yellowPlayer: 0,
+  redPlayer: 0,
+  draw: 0,
+};
 
 export const getData = async (req, res) => {
     try {

@@ -1,5 +1,5 @@
 import { winningCombinations } from "./WINNING_COMBINATIONS.js";
-import { games } from "../server.js";
+import { games } from "../services/connectFourRoutes.js";
 import { connectToDatabase } from "../database.js";
 
 export class Connect4 {

@@ -1,6 +1,7 @@
 import express from "express";
-import { Server } from 'socket.io';
+import dotenv from 'dotenv';
 
+import { Server } from 'socket.io';
 import { Connect4_Online } from "../connect4/onlineGame.js";
 import { TicTacToe_Online } from "../ticTacToe/onlineGame.js";
 import { socket_authenticatePlayer } from "./authentication.js";
@@ -8,6 +9,7 @@ import { socket_authenticatePlayer } from "./authentication.js";
 const game_Online = new Connect4_Online();
 const ticTacToe_Online_Game = new TicTacToe_Online()
 const app = express();
+dotenv.config();
 const server = createServer(app);
 const socketPort = 4001
 

@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
+import dotenv from 'dotenv';
 import { footer } from "./services/footer.js";
 import {
   authenticatePlayer,
@@ -31,29 +32,17 @@ import {
 
 const app = express();
 const port = 4000;
+dotenv.config();
 const allowedOrigins = process.env.BASE_URL
+console.log('allowedOrigins', allowedOrigins)
 
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-})
+app.use(cors( {
+  origin: process.env.BASE_URL, 
+  methods: ["GET", "POST", 'PUT', 'PATCH'], 
+  credentials: true 
+},)
 );
 app.use(bodyParser.json());
-
-export let games = {
-  yellowPlayer: 0,
-  redPlayer: 0,
-  draw: 0,
-};
-
-console.log("CORS Allowed Origin:", process.env.BASE_URL);
-
 
 // connectFour
 
