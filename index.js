@@ -32,10 +32,10 @@ import {
 
 const app = express();
 const port = 4000
- 
+dotenv.config();
 
-console.log("Process Env PORT:", process.env.PORT);
-console.log("Process Env BASE_URL:", process.env.BASE_URL);
+
+console.log("Process Env BASE_URL:")
 
 app.use(cors( {
   origin: '*', 
