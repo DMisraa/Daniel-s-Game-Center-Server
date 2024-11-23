@@ -38,7 +38,7 @@ const allowedOrigins = process.env.BASE_URL
 console.log('allowedOrigins', allowedOrigins)
 
 app.use(cors( {
-  origin: process.env.BASE_URL, 
+  origin: '*', 
   methods: ["GET", "POST", 'PUT', 'PATCH'], 
   credentials: true 
 },)
