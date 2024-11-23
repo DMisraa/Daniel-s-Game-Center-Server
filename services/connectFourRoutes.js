@@ -23,9 +23,7 @@ export const getData = async (req, res) => {
         game.playerNames = document.playerNames;
         games = document.allTimeWinners;
         game.turns = document.turnLength
-      } else {
-        return null;
-      }
+      } 
   
       res.json({
         board: game.board,
