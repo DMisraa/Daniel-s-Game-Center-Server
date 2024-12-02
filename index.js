@@ -2,7 +2,10 @@ import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import dotenv from 'dotenv';
+
+import { createServer } from "http";
 import { footer } from "./services/footer.js";
+import { initializeWebSocket } from "./services/socket.js";
 import {
   authenticatePlayer,
   authenticateTicTacToePlayer,
@@ -32,6 +35,7 @@ import {
 
 const app = express();
 const port = 4000
+const httpServer = createServer(app)
 dotenv.config();
 
 
@@ -44,6 +48,11 @@ app.use(cors( {
 },)
 );
 app.use(bodyParser.json());
+
+
+// Web Socket
+
+initializeWebSocket(httpServer);
 
 // connectFour
 

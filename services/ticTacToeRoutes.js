@@ -3,6 +3,8 @@ import { ObjectId } from "mongodb";
 import { TicTacToe } from "../ticTacToe/game.js";
 import { TicTacToe_Online } from "../ticTacToe/onlineGame.js";
 import { Connect4_Online } from "../connect4/onlineGame.js";
+import { generateTokenByLink } from "./authentication.js";
+import { connectToTicTacToeGameId } from "../database.js";
 
 
 const ticTacToe_Game = new TicTacToe();
@@ -39,7 +41,7 @@ export const ticTacToe_getData = async (req, res) => {
   }
 
   export const ticTacToe_gameInvite = async (req, res) => {
-    const { userEmail, rivalUserEmail, userName, rivalName } = req.body;
+    const { userEmail, rivalUserEmail, userName, rivalName, whatsappInvite } = req.body;
     const gameId = new ObjectId();
     const gameIdStringfy = gameId.toString()
   
@@ -91,15 +93,6 @@ export const ticTacToe_getData = async (req, res) => {
     };
   
     try {
-      const transporter = await game_Online.sendMail()
-      await transporter.sendMail(msg);
-      res.status(200).json({ gameId: gameIdStringfy });
-    } catch (error) {
-      console.error("Error sending email:", error);
-      res.status(500).json({ error: "Failed to send invitation." });
-    }
-  
-    try {
       const { gameCenterCollection, client } = await connectToTicTacToeGameId();
       await gameCenterCollection.updateOne(
         { _id: gameIdStringfy },
@@ -110,6 +103,21 @@ export const ticTacToe_getData = async (req, res) => {
     } catch (error) {
       console.error("Error sending userName data", error);
     }
+    
+    if (whatsappInvite) {
+      res.json({ gameCreatorLink, invitedPlayerLink })
+    } else {
+       try {
+      const transporter = await game_Online.sendMail()
+      await transporter.sendMail(msg);
+      res.status(200).json({ gameCreatorLink });
+    } catch (error) {
+      console.error("Error sending email:", error);
+      res.status(500).json({ error: "Failed to send invitation." });
+    }
+    }
+   
+  
   }
 
   export const onlineGame_getData = async (req, res) => {

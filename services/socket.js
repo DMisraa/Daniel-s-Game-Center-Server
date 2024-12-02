@@ -5,17 +5,22 @@ import { Server } from 'socket.io';
 import { Connect4_Online } from "../connect4/onlineGame.js";
 import { TicTacToe_Online } from "../ticTacToe/onlineGame.js";
 import { socket_authenticatePlayer } from "./authentication.js";
+import { createServer } from "http";
+
 
 const game_Online = new Connect4_Online();
 const ticTacToe_Online_Game = new TicTacToe_Online()
 const app = express();
 dotenv.config();
-const server = createServer(app);
+const httpserver = createServer(app);
 const socketPort = 4001
 
-const io = new Server(server, {
+export function initializeWebSocket(httpserver) {
+  
+
+const io = new Server(httpserver, {
     cors: {
-      origin: process.env.BASE_URL, 
+      origin: '*', 
       methods: ["GET", "POST", 'PUT', 'PATCH'], 
       credentials: true 
     },
@@ -85,6 +90,7 @@ io.on('connection', (socket) => {
     });
   });
   
-  server.listen(socketPort, () => {
+  httpserver.listen(socketPort, () => {
     console.log(`Real-Time server ${socketPort}`);
   });
+}

@@ -1,6 +1,8 @@
 import { ObjectId } from "mongodb";
 import { Connect4 } from "../connect4/game.js";
 import { Connect4_Online } from "../connect4/onlineGame.js";
+import { generateTokenByLink } from "./authentication.js";
+import { connectToGameIdDatabase } from "../database.js";
 
 const game = new Connect4();
 const game_Online = new Connect4_Online();
@@ -12,7 +14,7 @@ export let games = {
 };
 
 export const getData = async (req, res) => {
-  console.log('connectfour get running')
+ 
     try {
       const document = await game.getAllData();
   
@@ -24,9 +26,7 @@ export const getData = async (req, res) => {
         game.playerNames = document.playerNames;
         games = document.allTimeWinners;
         game.turns = document.turnLength
-      } else {
-        return null
-      }
+      } 
   
       res.json({
         board: game.board,
@@ -44,7 +44,7 @@ export const getData = async (req, res) => {
   }
 
   export const playerMove = async (req, res) => {
-    console.log('connectfour move running')
+    
     const { column } = req.body;
     const success = game.makeMove(column);
   
@@ -83,7 +83,10 @@ export const getData = async (req, res) => {
   }
 
   export const gameInvite = async (req, res) => {
-    const { userEmail, rivalUserEmail, userName, rivalName } = req.body;
+    const { userEmail, rivalUserEmail, userName, rivalName, whatsappInvite } = req.body;
+    
+    console.log(userEmail, rivalUserEmail, userName, rivalName, whatsappInvite)
+    
     const gameId = new ObjectId();
     const gameIdStringfy = gameId.toString();
   
@@ -131,14 +134,7 @@ export const getData = async (req, res) => {
       html: `<p>Hi ${rivalName},</p> <p>${userName} has invited you to a game. Click the link below to join the match:</p><p><a href="${invitedPlayerLink}">Join the Game</a></p><p>Good luck!</p> ${gameCreatorLink}`,
     };
   
-    try {
-      const transporter = await game_Online.sendMail()
-      await transporter.sendMail(msg);
-      res.status(200).json({ gameId: gameIdStringfy });
-    } catch (error) {
-      console.error("Error sending email:", error);
-      res.status(500).json({ error: "Failed to send invitation." });
-    }
+  
   
     try {
       const { gameCenterCollection, client } = await connectToGameIdDatabase();
@@ -151,6 +147,19 @@ export const getData = async (req, res) => {
     } catch (error) {
       console.error("Error sending userName data", error);
     }
+     if (whatsappInvite) {
+      res.json({ gameCreatorLink, invitedPlayerLink })
+     } else {
+      try {
+      const transporter = await game_Online.sendMail()
+      await transporter.sendMail(msg);
+      res.status(200).json({ gameCreatorLink });
+    } catch (error) {
+      console.error("Error sending email:", error);
+      res.status(500).json({ error: "Failed to send invitation." });
+    }
+     }
+    
   }
 
   export const newGameChallenge = async (req, res) => {
