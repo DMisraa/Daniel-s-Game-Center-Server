@@ -2,7 +2,7 @@ import { Connect4_Online } from "../connect4/onlineGame.js";
 
 const game_Online = new Connect4_Online();
 
-export const footer = async (req, res) => {
+export async function footer(req, res) {
     const {name, email, message} = req.body
  
     const msg = {

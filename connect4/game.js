@@ -10,6 +10,8 @@ export class Connect4 {
     this.turns = 0;
     this.gameId = "p1"
     this.hasDraw = false
+    this.timeoutId = null;
+    this.inactivityPeriod = 10 * 60 * 1000;
     this.playerNames = {
       bluePlayer: "Blue Player",
       redPlayer: "Red Player",
@@ -27,7 +29,7 @@ export class Connect4 {
     return this.turns === 42 && !this.winner;
   }
 
-  async startOver() {
+  async startOver(timeOut) {
     this.board = Array.from({ length: 6 }, () => Array(7).fill(null));
     this.winner = null;
     this.turns = 0
@@ -41,6 +43,10 @@ export class Connect4 {
       turnLength: this.turns
     };
 
+    if (timeOut) {
+      data.playerNames = this.playerNames
+    }
+
     try {
       const { gameCenterCollection, client } = await connectToDatabase();
 
@@ -53,6 +59,20 @@ export class Connect4 {
       console.error(error);
     }
     return;
+  }
+
+  startInactivityTimer() {
+    if (this.timeoutId) {
+      clearTimeout(this.timeoutId);
+    }
+
+    this.timeoutId = setTimeout(() => {
+      let timeOut
+      this.startOver(timeOut);
+      console.log('timeOut Activated')
+    }, this.inactivityPeriod);
+
+    console.log('Inactivity timer start');
   }
 
   async playerDatabase(playerNames) {
@@ -132,7 +152,7 @@ export class Connect4 {
       this.board[0][column] !== null ||
       this.winner
     ) {
-      return false; // Invalid move
+      return false;
     }
 
     for (let row = 5; row >= 0; row--) {
@@ -141,8 +161,9 @@ export class Connect4 {
         this.turns++;
         this.checkForWinner();
         if (!this.winner) {
-          this.currentPlayer = this.currentPlayer === "red" ? "yellow" : "red";
+          this.currentPlayer = this.currentPlayer === "red" ? "blue" : "red";
         }
+
         return true;
       }
     }

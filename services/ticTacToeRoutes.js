@@ -12,7 +12,7 @@ const ticTacToe_Online_Game = new TicTacToe_Online()
 const game_Online = new Connect4_Online();
 
 
-export const ticTacToe_getData = async (req, res) => {
+export async function ticTacToe_getData(req, res) {
     let data;
     const document = await ticTacToe_Game.getAllData();
   
@@ -26,21 +26,21 @@ export const ticTacToe_getData = async (req, res) => {
     res.json(data);
   }
 
-  export const ticTacToe_playerMove = async (req, res) => {
+  export async function ticTacToe_playerMove(req, res) {
     const gameBoard = req.body;
     await ticTacToe_Game.ticTacToeDataBase(gameBoard);
   
     res.json();
   }
 
-  export const ticTacToe_editPlayerName = async (req, res) => {
+  export async function ticTacToe_editPlayerName(req, res) {
     const { playerName, symbol } = req.body;
     ticTacToe_Game.updatePlayerNames(playerName, symbol);
   
     res.json();
   }
 
-  export const ticTacToe_gameInvite = async (req, res) => {
+  export async function ticTacToe_gameInvite(req, res) {
     const { userEmail, rivalUserEmail, userName, rivalName, whatsappInvite } = req.body;
     const gameId = new ObjectId();
     const gameIdStringfy = gameId.toString()
@@ -120,7 +120,7 @@ export const ticTacToe_getData = async (req, res) => {
   
   }
 
-  export const onlineGame_getData = async (req, res) => {
+  export async function onlineGame_getData(req, res) {
     const gameId = req.params.gameId;
     try {
       const document = await ticTacToe_Online_Game.getAllData(gameId);
@@ -172,7 +172,7 @@ export const ticTacToe_getData = async (req, res) => {
     }
   }
 
-  export const onlineGame_PlayerMove = async (req, res) => {
+  export async function onlineGame_PlayerMove(req, res) {
     const { gameBoard, playerNames } = req.body;
     let board = [
       [null, null, null],
@@ -189,7 +189,7 @@ export const ticTacToe_getData = async (req, res) => {
     res.json(gameBoard);
   }
 
-  export const ticTacToe_newGameChallenge = async (req, res) => {
+  export async function ticTacToe_newGameChallenge(req, res) {
     const playerId = req.body;
     const gameId = req.params.gameId;
     await ticTacToe_Online_Game.newGameChallenge(playerId, gameId);
@@ -197,7 +197,7 @@ export const ticTacToe_getData = async (req, res) => {
     res.json();
   }
 
-  export const startOver = async (req, res) => {
+  export async function startOver(req, res) {
     const { gameId, players } = req.body
     const success = ticTacToe_Online_Game.startOver(gameId, players)
   
@@ -207,7 +207,7 @@ export const ticTacToe_getData = async (req, res) => {
     res.json();
   }
 
-  export const sendMail = async (req, res) => {
+  export async function sendMail(req, res) {
     const {playerNames, emailAdress, gameLinksWithTokens} = req.body
     const msg = {
       from: emailAdress.InvitedPlayer,

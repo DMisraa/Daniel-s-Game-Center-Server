@@ -13,7 +13,7 @@ export let games = {
   draw: 0,
 };
 
-export const getData = async (req, res) => {
+export async function getData(req, res) {
  
     try {
       const document = await game.getAllData();
@@ -43,7 +43,7 @@ export const getData = async (req, res) => {
     }
   }
 
-  export const playerMove = async (req, res) => {
+  export async function playerMove(req, res) {
     
     const { column } = req.body;
     const success = game.makeMove(column);
@@ -66,6 +66,8 @@ export const getData = async (req, res) => {
       games.draw++;
       await game.startOver();
     }
+
+    game.startInactivityTimer()
   
     res.json({
       board: game.getBoard(),
@@ -76,13 +78,20 @@ export const getData = async (req, res) => {
     });
   }
 
-  export const editPlayerName = (req, res) => {
+  export async function editPlayerName(req, res) {
     const playerNames = req.body;
     game.playerDatabase(playerNames);
     res.json(playerNames);
   }
 
-  export const gameInvite = async (req, res) => {
+  export async function startOver(req, res) {
+    let timeOut
+    await game.startOver(timeOut)
+
+    res.json()
+  }
+
+  export async function gameInvite(req, res) {
     const { userEmail, rivalUserEmail, userName, rivalName, whatsappInvite } = req.body;
     
     console.log(userEmail, rivalUserEmail, userName, rivalName, whatsappInvite)
@@ -159,17 +168,16 @@ export const getData = async (req, res) => {
       res.status(500).json({ error: "Failed to send invitation." });
     }
      }
-    
   }
 
-  export const newGameChallenge = async (req, res) => {
+  export async function newGameChallenge(req, res) {
     const playerId = req.body;
     const gameId = req.params.gameId;
     await game_Online.newGameChallenge(playerId, gameId);
     res.json();
   }
 
-  export const getOnlineGameData = async (req, res) => {
+  export async function getOnlineGameData(req, res) {
     const gameId = req.params.gameId;
       const document = await game_Online.getAllData(gameId);
       let board = Array.from({ length: 6 }, () => Array(7).fill(null));
@@ -214,7 +222,7 @@ export const getData = async (req, res) => {
       });
   }
 
-  export const onlineGame_PlayerMove = async (req, res) => {
+  export async function onlineGame_PlayerMove(req, res) {
     const gameId = req.params.gameId;
     const { column } = req.body;
     const success = game_Online.makeMove(column, gameId);
@@ -225,7 +233,7 @@ export const getData = async (req, res) => {
     res.json();
   }
 
-export const onlineGame_startOver = async (req, res) => {
+export async function onlineGame_startOver(req, res) {
     const { gameId, yellowPlayerName, redPlayerName } = req.body
     const success = game_Online.startOver(gameId, yellowPlayerName, redPlayerName)
   

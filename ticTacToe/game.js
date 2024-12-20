@@ -20,6 +20,8 @@ export class TicTacToe {
     this.winner = null;
     this.turns = 0;
     this.gameId = "p2";
+    this.timeoutId = null;
+    this.inactivityPeriod = 10 * 60 * 1000;
     this.playerNames = {
       X: "Player 1",
       O: "Player 2",
@@ -63,6 +65,45 @@ export class TicTacToe {
       throw error;
     } 
   }
+
+  startInactivityTimer() {
+    if (this.timeoutId) {
+      clearTimeout(this.timeoutId);
+    }
+
+    this.timeoutId = setTimeout(() => {
+      let timeOut
+      this.startOver(timeOut);
+      console.log('timeOut Activated')
+    }, this.inactivityPeriod);
+
+    console.log('Inactivity timer start');
+  }
+
+  async startOver() {
+    let data = {
+      gameBoard: initialGameBoard,
+      playerNames: {
+        X: this.playerNames.X,
+        O: this.playerNames.O,
+      },
+  }
+
+  try {
+    const { gameCenterCollection, client } =
+      await connectToTicTacToeDatabase();
+
+    await gameCenterCollection.updateOne(
+      { _id: this.gameId },
+      { $set: data },
+    );
+    await client.close();
+  } catch (error) {
+    console.error(error);
+  }
+  return;
+}
+
 
   async ticTacToeDataBase(gameBoard) {
     this.turns++
