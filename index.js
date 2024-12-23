@@ -33,11 +33,11 @@ import {
   sendMail,
 } from "./services/ticTacToeRoutes.js";
 
+dotenv.config();
+
 const app = express();
 const port = 4000
 const httpServer = createServer(app)
-dotenv.config();
-
 
 console.log("Process Env BASE_URL:", process.env.BASE_URL )
 
@@ -47,8 +47,8 @@ app.use(cors( {
   credentials: true 
 },)
 );
-app.use(bodyParser.json());
 
+app.use(bodyParser.json());
 
 // Web Socket
 

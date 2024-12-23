@@ -29,6 +29,7 @@ export async function ticTacToe_getData(req, res) {
   export async function ticTacToe_playerMove(req, res) {
     const gameBoard = req.body;
     await ticTacToe_Game.ticTacToeDataBase(gameBoard);
+    ticTacToe_Game.startInactivityTimer()
   
     res.json();
   }
