@@ -7,16 +7,16 @@ import { TicTacToe_Online } from "../ticTacToe/onlineGame.js";
 import { socket_authenticatePlayer } from "./authentication.js";
 import { createServer } from "http";
 
+dotenv.config();
 
 const game_Online = new Connect4_Online();
 const ticTacToe_Online_Game = new TicTacToe_Online()
 const app = express();
-dotenv.config();
+
 const httpserver = createServer(app);
 const socketPort = 4001
 
 export function initializeWebSocket(httpserver) {
-  
 
 const io = new Server(httpserver, {
     cors: {
@@ -43,7 +43,7 @@ io.on('connection', (socket) => {
       }
   
       const gameData = await ticTacToe_Online_Game.makeMove(board, gameId, playerNames);
-      io.to(gameId).emit("initialPageLoad", gameData); // Broadcast to all users in the room
+      io.to(gameId).emit("initialPageLoad", gameData); 
     });
   
     socket.on('startOver_Req', async ({playerId, gameId}) => {
@@ -90,7 +90,7 @@ io.on('connection', (socket) => {
     });
   });
   
-  httpserver.listen(socketPort, () => {
+  httpserver.listen(process.env.PORT || socketPort, () => {
     console.log(`Real-Time server ${socketPort}`);
   });
 }
