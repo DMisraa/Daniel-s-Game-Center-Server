@@ -37,29 +37,29 @@ import {
 dotenv.config();
 
 const app = express();
-const port = 4000
-const httpServer = createServer(app)
+const port = 4000; 
 
-console.log("Process Env BASE_URL:", process.env.BASE_URL )
+const httpServer = createServer(app);
+const io = new Server(httpServer, {   
+  cors: {
+    origin: '*',
+    methods: ["GET", "POST", 'PUT', 'PATCH'],
+    credentials: true
+  },
+});
 
-app.use(cors( {
-  origin: '*', 
-  methods: ["GET", "POST", 'PUT', 'PATCH'], 
-  credentials: true 
-},)
-);
+console.log("Process Env BASE_URL:", process.env.BASE_URL);
+
+app.use(cors({
+  origin: '*',
+  methods: ["GET", "POST", 'PUT', 'PATCH'],
+  credentials: true
+}));
 
 app.use(bodyParser.json());
 
 // Web Socket
 
-const io = new Server(httpServer, {
-  cors: {
-    origin: '*', 
-    methods: ["GET", "POST", 'PUT', 'PATCH'], 
-    credentials: true 
-  },
-})
 initializeWebSocket(io)
 
 // connectFour
@@ -110,6 +110,6 @@ app.post("/ticTacToe/sendMail", sendMail);
 
 app.post("/footerContact", footer);
 
-app.listen(port, () => {
-  console.log(`Connect 4 server running on port ${port}`);
+httpServer.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });

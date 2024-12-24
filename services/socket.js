@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from 'dotenv';
 
+import { createServer } from "http";
 import { Connect4_Online } from "../connect4/onlineGame.js";
 import { TicTacToe_Online } from "../ticTacToe/onlineGame.js";
 import { socket_authenticatePlayer } from "./authentication.js";
@@ -14,12 +15,15 @@ const app = express();
 // const httpserver = createServer(app);
 // const socketPort = 4000
 
+
 export function initializeWebSocket(io) {
 
 io.on('connection', (socket) => {
   console.log('New WebSocket connection:', socket.id);
+
     socket.on("joinRoom", ({gameId}) => {
       socket.join(gameId);
+      console.log('user joined room:', gameId);
     });
   
    socket.on("initial_GET", async ({gameId}) => {
@@ -64,7 +68,7 @@ io.on('connection', (socket) => {
       }
   
       const gameData = await game_Online.makeMove(column, gameId);
-      io.to(gameId).emit("connectFour_Initial", gameData); // Broadcast to all users in the room
+      io.to(gameId).emit("connectFour_Initial", gameData); 
     });
   
     socket.on('ConnectFour_startOver_Req', async ({ playerId, gameId }) => {
