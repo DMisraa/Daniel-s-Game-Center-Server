@@ -1,11 +1,9 @@
 import express from "express";
 import dotenv from 'dotenv';
 
-import { Server } from 'socket.io';
 import { Connect4_Online } from "../connect4/onlineGame.js";
 import { TicTacToe_Online } from "../ticTacToe/onlineGame.js";
 import { socket_authenticatePlayer } from "./authentication.js";
-import { createServer } from "http";
 
 dotenv.config();
 
@@ -13,18 +11,11 @@ const game_Online = new Connect4_Online();
 const ticTacToe_Online_Game = new TicTacToe_Online()
 const app = express();
 
-const httpserver = createServer(app);
-const socketPort = 4000
+// const httpserver = createServer(app);
+// const socketPort = 4000
 
-export function initializeWebSocket(httpserver) {
+export function initializeWebSocket(io) {
 
-const io = new Server(httpserver, {
-    cors: {
-      origin: '*', 
-      methods: ["GET", "POST", 'PUT', 'PATCH'], 
-      credentials: true 
-    },
-  })
 io.on('connection', (socket) => {
   console.log('New WebSocket connection:', socket.id);
     socket.on("joinRoom", ({gameId}) => {
@@ -89,9 +80,5 @@ io.on('connection', (socket) => {
     socket.on("disconnect", () => {
       console.log("A user disconnected:", socket.id);
     });
-  });
-  
-  httpserver.listen(process.env.PORT || socketPort, () => {
-    console.log(`Real-Time server ${socketPort}`);
   });
 }

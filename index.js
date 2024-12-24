@@ -3,6 +3,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import dotenv from 'dotenv';
 
+import { Server } from 'socket.io';
 import { createServer } from "http";
 import { footer } from "./services/footer.js";
 import { initializeWebSocket } from "./services/socket.js";
@@ -52,7 +53,14 @@ app.use(bodyParser.json());
 
 // Web Socket
 
-initializeWebSocket(httpServer);
+const io = new Server(httpServer, {
+  cors: {
+    origin: '*', 
+    methods: ["GET", "POST", 'PUT', 'PATCH'], 
+    credentials: true 
+  },
+})
+initializeWebSocket(io)
 
 // connectFour
 
@@ -102,6 +110,6 @@ app.post("/ticTacToe/sendMail", sendMail);
 
 app.post("/footerContact", footer);
 
-app.listen(process.env.PORT || port, () => {
+app.listen(port, () => {
   console.log(`Connect 4 server running on port ${port}`);
 });
