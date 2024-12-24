@@ -14,7 +14,7 @@ const ticTacToe_Online_Game = new TicTacToe_Online()
 const app = express();
 
 const httpserver = createServer(app);
-const socketPort = 4001
+const socketPort = 4000
 
 export function initializeWebSocket(httpserver) {
 

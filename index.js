@@ -102,6 +102,6 @@ app.post("/ticTacToe/sendMail", sendMail);
 
 app.post("/footerContact", footer);
 
-app.listen(port, () => {
+app.listen(process.env.PORT || port, () => {
   console.log(`Connect 4 server running on port ${port}`);
 });
