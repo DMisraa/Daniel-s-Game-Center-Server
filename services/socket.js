@@ -26,6 +26,7 @@ const io = new Server(httpserver, {
     },
   })
 io.on('connection', (socket) => {
+  console.log('New WebSocket connection:', socket.id);
     socket.on("joinRoom", ({gameId}) => {
       socket.join(gameId);
     });
