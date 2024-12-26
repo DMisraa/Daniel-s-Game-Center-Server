@@ -63,8 +63,11 @@ export class TicTacToe_Online {
     const gameData = await this.getAllData(gameId);
     let allTimeScore = gameData.allTimeWinners;
     let turns = gameData.turns;
+    turns++;
+    console.log('turns:', turns)
     const winner = this.deriveWinner(playerNames, gameBoard);
     const hasDraw = turns === 9 && !winner;
+    console.log('hasDraw:', hasDraw)
 
     if (!winner) {
         currentPlayer = currentPlayer === "X" ? "O" : "X";
@@ -84,15 +87,14 @@ export class TicTacToe_Online {
       }
     }
 
-    turns++;
-
     const data = {
       allTimeWinners: allTimeScore,
       turns: turns,
       board: gameBoard,
       winner: winner,
       currentPlayer: currentPlayer,
-      playerNames
+      playerNames,
+      hasDraw
     };
 
     this.updateDatabase(gameId, data);
@@ -131,7 +133,6 @@ export class TicTacToe_Online {
 
     const data = {
       board: board,
-      currentPlayer: 'X',
       winner: null,
       turns: 0,
       playerNames: players,
