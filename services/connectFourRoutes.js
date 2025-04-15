@@ -56,7 +56,7 @@ export async function getData(req, res) {
     const winner = game.getWinner();
     const isDraw = game.isDraw();
   
-    if (winner === "yellow") {
+    if (winner === "blue") {
       games.yellowPlayer++;
       await game.startOver();
     } else if (winner === "red") {

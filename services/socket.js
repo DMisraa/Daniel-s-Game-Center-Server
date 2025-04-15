@@ -1,7 +1,5 @@
-import express from "express";
 import dotenv from 'dotenv';
 
-import { createServer } from "http";
 import { Connect4_Online } from "../connect4/onlineGame.js";
 import { TicTacToe_Online } from "../ticTacToe/onlineGame.js";
 import { socket_authenticatePlayer } from "./authentication.js";
@@ -10,10 +8,6 @@ dotenv.config();
 
 const game_Online = new Connect4_Online();
 const ticTacToe_Online_Game = new TicTacToe_Online()
-const app = express();
-
-// const httpserver = createServer(app);
-// const socketPort = 4000
 
 
 export function initializeWebSocket(io) {

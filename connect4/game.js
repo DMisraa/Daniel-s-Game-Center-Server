@@ -13,7 +13,7 @@ export class Connect4 {
     this.timeoutId = null;
     this.inactivityPeriod = 10 * 60 * 1000;
     this.playerNames = {
-      bluePlayer: "Blue Player",
+      yellowPlayer: "Blue Player",
       redPlayer: "Red Player",
     };
   }

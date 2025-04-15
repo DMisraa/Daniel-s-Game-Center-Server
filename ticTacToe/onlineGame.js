@@ -82,7 +82,6 @@ export class TicTacToe_Online {
         allTimeScore.O++;
         turns = 0;
       } else if (hasDraw) {
-        allTimeScore.Draw++;
         turns = 0;
       }
     }
